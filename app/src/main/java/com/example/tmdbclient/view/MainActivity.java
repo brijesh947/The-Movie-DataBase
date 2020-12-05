@@ -9,6 +9,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.annotation.SuppressLint;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.example.tmdbclient.R;
 import com.example.tmdbclient.adapter.MovieAdapter;
@@ -63,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<MovieDBResponse> call, Throwable t) {
-
+                Toast.makeText(getApplicationContext(),"here I'm on failure",Toast.LENGTH_LONG).show();
             }
         });
     }
