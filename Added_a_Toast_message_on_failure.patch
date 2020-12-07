@@ -1,0 +1,35 @@
+Index: app/src/main/java/com/example/tmdbclient/view/MainActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/tmdbclient/view/MainActivity.java	(revision Local Version)
++++ app/src/main/java/com/example/tmdbclient/view/MainActivity.java	(revision Shelved Version)
+@@ -9,6 +9,7 @@
+ import android.annotation.SuppressLint;
+ import android.content.res.Configuration;
+ import android.os.Bundle;
++import android.widget.Toast;
+ 
+ import com.example.tmdbclient.R;
+ import com.example.tmdbclient.adapter.MovieAdapter;
+@@ -63,6 +64,7 @@
+ 
+             @Override
+             public void onFailure(Call<MovieDBResponse> call, Throwable t) {
++                Toast.makeText(getApplicationContext(),"I'm failed",Toast.LENGTH_SHORT).show();
+ 
+             }
+         });
+Index: .idea/vcs.xml
+===================================================================
+--- .idea/vcs.xml	(revision Shelved Version)
++++ .idea/vcs.xml	(revision Shelved Version)
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="VcsDirectoryMappings">
++    <mapping directory="$PROJECT_DIR$" vcs="Git" />
++  </component>
++</project>
+\ No newline at end of file
