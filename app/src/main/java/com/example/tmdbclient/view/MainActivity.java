@@ -1,7 +1,10 @@
 package com.example.tmdbclient.view;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -39,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private MovieAdapter movieAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
     private Observable<MovieDBResponse> movieDBResponseObservable;
+    boolean isNetwork;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
     @SuppressLint("ResourceAsColor")
     @Override
@@ -46,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getSupportActionBar().setTitle("TMDB Popular Movies Today");
+        isNetwork = checkInternetConnection(getApplicationContext());
 
         swipeRefreshLayout = findViewById(R.id.swiperefresh);
 
@@ -54,14 +59,38 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onRefresh() {
                 Log.d("MainActivity", "onRefresh: swipe Refresh layout");
-                getPopularMoviesWithRx();
+                isNetwork = checkInternetConnection(getApplicationContext());
+                if(isNetwork){
+                    getPopularMoviesWithRx();
+                }
+               else {
+                   dealWithNetworkFail();
+                }
+                swipeRefreshLayout.setRefreshing(false);
             }
         });
-        getPopularMoviesWithRx();
+        if(isNetwork){
+            getPopularMoviesWithRx();
+        }else {
+            dealWithNetworkFail();
+        }
+    }
+
+    private void dealWithNetworkFail() {
+        Toast.makeText(getApplicationContext(),"Check Your Internet connection And try again",Toast.LENGTH_LONG).show();
+    }
+
+    private boolean checkInternetConnection(Context context) {
+        NetworkInfo info = ((ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+        if(info==null || !info.isConnected()){
+            return false;
+        }
+        return true;
     }
 
     private void getPopularMoviesWithRx() {
         MovieDataService movieDataService = RetrofitInstance.getService();
+        Log.d("TAG", "getPopularMoviesWithRx: " + movieDataService);
 //        Observable<MovieDBResponse> observable = movieDataService.getPopularMoviesWithRx(this.getString(R.string.api_key));
          movieDBResponseObservable = movieDataService.getPopularMoviesWithRx(this.getString(R.string.api_key));
          compositeDisposable.add( movieDBResponseObservable.subscribeOn(Schedulers.io())
@@ -102,9 +131,9 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.rvMovies);
         movieAdapter = new MovieAdapter(MainActivity.this,movies);
         if(this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-            recyclerView.setLayoutManager(new GridLayoutManager(this,2));
+            recyclerView.setLayoutManager(new GridLayoutManager(this,1));
         }else {
-            recyclerView.setLayoutManager(new GridLayoutManager(this,4));
+            recyclerView.setLayoutManager(new GridLayoutManager(this,2));
         }
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(movieAdapter);
